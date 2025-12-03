@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi Alarm</title>
+
+<style>
+body { text-align:center; font-family:Arial; padding-top:30px; background:#eef4ff; }
+input {
+  font-size:20px; padding:6px; width:80px; text-align:center;
+  margin:5px; border-radius:8px; border:1px solid #007bff;
+}
+button {
+  font-size:18px; padding:9px 18px; border:none; margin:5px;
+  background:#007bff; color:white; border-radius:10px;
+}
+#list { margin-top:25px; font-size:20px; }
+.item { background:white; margin:6px auto; padding:10px; width:240px;
+        border-radius:10px; border:1px solid #007bff; }
+</style>
+</head>
+
+<body>
+<h2>⏰ MULTI ALARM CUSTOM</h2>
+<p>Tambah alarm sebanyak yang dibutuhkan</p>
+
+<label>Jam: <input type="number" id="jam" min="0" max="23" value="7"></label>
+<label>Menit: <input type="number" id="menit" min="0" max="59" value="9"></label>
+<br>
+<button onclick="tambahAlarm()">TAMBAH ALARM</button>
+<button onclick="stopSemua()">STOP SEMUA</button>
+
+<div id="list"></div>
+
+<audio id="alarmSound">
+  <source src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3">
+</audio>
+
+<script>
+let alarms = [];
+let audio = document.getElementById("alarmSound");
+
+// Tambah jadwal alarm
+function tambahAlarm() {
+  let j = parseInt(document.getElementById("jam").value);
+  let m = parseInt(document.getElementById("menit").value);
+
+  alarms.push({jam:j, menit:m});
+  tampilkan();
+}
+
+// Tampilkan daftar alarm
+function tampilkan() {
+  let html = "";
+  alarms.forEach((a,i)=>{
+    html += `<div class="item">⏰ ${a.jam.toString().padStart(2,'0')} : ${a.menit.toString().padStart(2,'0')}
+    <br><button onclick="hapusAlarm(${i})">Hapus</button></div>`;
+  });
+  document.getElementById("list").innerHTML = html;
+}
+
+// Hapus satu alarm
+function hapusAlarm(i) {
+  alarms.splice(i,1);
+  tampilkan();
+}
+
+// Stop semua alarm
+function stopSemua() {
+  audio.pause();
+  audio.currentTime = 0;
+  navigator.vibrate([0]);
+  alarms = [];
+  tampilkan();
+}
+
+// Cek waktu tiap detik
+setInterval(()=>{
+  let now = new Date();
+  alarms.forEach(a=>{
+    if (now.getHours()===a.jam && now.getMinutes()===a.menit && now.getSeconds()===0) {
+      bunyi();
+    }
+  });
+},1000);
+
+// Alarm bunyi
+function bunyi() {
+  audio.play();
+  if (navigator.vibrate) navigator.vibrate([600,300,600,300,600]);
+  alert("⏰ Alarm Berbunyi!");
+}
+</script>
+
+</body>
+</html>
